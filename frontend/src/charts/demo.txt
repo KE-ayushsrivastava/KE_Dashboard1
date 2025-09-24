@@ -1,0 +1,142 @@
+//
+
+import React from "react";
+
+export default function ColumnXChart({ config }) {
+  if (!config || !config.series) return <p>⏳ Loading chart...</p>;
+
+  const totalHeight = 120; // px
+  const barWidth = 30; // px
+  const depth = 10; // prism depth
+  const gap = 60; // distance between bars
+
+  return (
+    <svg
+      width={config.series.length * gap}
+      height={totalHeight + 50}
+      style={{ background: "#fff", borderRadius: "8px" }}
+    >
+      {config.series.map((item, idx) => {
+        const x = idx * gap + 30;
+        const shellY = 20; // start Y for full shell
+        const barHeight = (item.value / 200) * totalHeight;
+        const fillY = shellY + (totalHeight - barHeight);
+
+        return (
+          <g key={idx}>
+            {/* === Outer Shell (grey, full height) === */}
+            {/* Front */}
+            <rect
+              x={x}
+              y={shellY}
+              width={barWidth}
+              height={totalHeight}
+              fill="url(#shellFront)"
+              stroke="#9ca3af"
+            />
+            {/* Left */}
+            <polygon
+              points={`
+                ${x},${shellY}
+                ${x - depth},${shellY - depth}
+                ${x - depth},${shellY - depth + totalHeight}
+                ${x},${shellY + totalHeight}
+              `}
+              fill="url(#shellLeft)"
+              stroke="#9ca3af"
+            />
+            {/* Top */}
+            <polygon
+              points={`
+                ${x},${shellY}
+                ${x + barWidth},${shellY}
+                ${x + barWidth - depth},${shellY - depth}
+                ${x - depth},${shellY - depth}
+              `}
+              fill="url(#shellTop)"
+              stroke="#9ca3af"
+            />
+
+            {/* === Fill (dynamic height) === */}
+            {/* Front */}
+            <rect
+              x={x}
+              y={fillY}
+              width={barWidth}
+              height={barHeight}
+              fill="url(#fillFront)"
+              stroke="#1e3a8a"
+            />
+            {/* Left */}
+            <polygon
+              points={`
+                ${x},${fillY}
+                ${x - depth},${fillY - depth}
+                ${x - depth},${fillY - depth + barHeight}
+                ${x},${fillY + barHeight}
+              `}
+              fill="url(#fillLeft)"
+              stroke="#1e3a8a"
+            />
+            {/* Top */}
+            <polygon
+              points={`
+                ${x},${fillY}
+                ${x + barWidth},${fillY}
+                ${x + barWidth - depth},${fillY - depth}
+                ${x - depth},${fillY - depth}
+              `}
+              fill="url(#fillTop)"
+              stroke="#1e3a8a"
+            />
+
+            {/* Brand Label */}
+            <text
+              x={x + barWidth / 2}
+              y={totalHeight + 40}
+              textAnchor="middle"
+              fontSize="10"
+              fill="#111827"
+            >
+              {item.brand}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* === Gradient Definitions === */}
+      <defs>
+        {/* Shell (grey) */}
+        <linearGradient id="shellFront" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#d1d5db" />
+          <stop offset="100%" stopColor="#e5e7eb" />
+        </linearGradient>
+        <linearGradient id="shellLeft" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#9ca3af" />
+          <stop offset="100%" stopColor="#d1d5db" />
+        </linearGradient>
+        <linearGradient id="shellTop" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#f3f4f6" />
+          <stop offset="100%" stopColor="#e5e7eb" />
+        </linearGradient>
+
+        {/* Fill (blue) */}
+        <linearGradient id="fillFront" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#2563eb" />
+          <stop offset="100%" stopColor="#60a5fa" />
+        </linearGradient>
+        <linearGradient id="fillLeft" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#1e3a8a" />
+          <stop offset="100%" stopColor="#3b82f6" />
+        </linearGradient>
+        <linearGradient id="fillTop" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#93c5fd" />
+          <stop offset="100%" stopColor="#bfdbfe" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+
+//

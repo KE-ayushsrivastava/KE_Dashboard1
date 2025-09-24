@@ -1,0 +1,71 @@
+/* custom.css */
+
+/* Reset some default margins/paddings */
+body,
+html,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #f5f5f0;
+}
+
+/* Main content padding */
+.main-content {
+  padding: 24px;
+  margin-left: 0px !important;
+}
+
+/* Header styles */
+.header-logo {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+/* Sidebar styles */
+.sidebar-item {
+  cursor: pointer;
+}
+
+/* Add hover effect for sidebar items */
+
+/* main-content gets a smooth transition between collapsed/expanded */
+.main-content {
+  transition: margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Optional: small shadow when sidebar expanded to make the split visible */
+.MuiDrawer-paper {
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px; /* adds spacing around text */
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+}
+
+.collapse-btn {
+  position: absolute;
+  left: 230px; /* adjust based on your sidebar width */
+  z-index: 2000; /* make sure it's above body content */
+  background: white;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.highcharts-title {
+  display: none !important;
+}
