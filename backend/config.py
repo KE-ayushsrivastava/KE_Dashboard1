@@ -4,8 +4,8 @@ from mysql.connector import pooling
 # Connection Pool Setup
 dbconfig = {
     "host": "localhost",
-    "user": "root",
-    "password": "pass@123",
+    "user": "kepython",
+    "password": "KePython@12345",
     "database": "pj_chakra_db"
 }
 
