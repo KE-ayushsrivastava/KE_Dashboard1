@@ -77,6 +77,7 @@ export default function AreaChart({ config, height }) {
           fontSize: "0.625rem",
           color: "#000",
         },
+        rotation: 0,
         useHTML: true,
         formatter: function () {
           return this.value.split(" ").join("<br>");
@@ -140,8 +141,32 @@ export default function AreaChart({ config, height }) {
             lineWidth: 2.5,
           },
         },
+        // dataLabels: {
+        //   style: {
+        //     textOutline: false,
+        //     fontSize: "0.7rem",
+        //   },
+        //   enabled: true,
+        //   verticalAlign: "bottom",
+        //   formatter: function () {
+        //     if (this) {
+        //       return this.y + "%";
+        //     }
+        //   },
+        // },
         dataLabels: {
-          enabled: false, // ✅ less clutter, cleaner look
+          enabled: true,
+          format: "{y}%",
+          align: "center",
+          verticalAlign: "top", // keeps all labels above
+          y: 0, // adjust spacing from point
+          style: {
+            textOutline: false,
+            fontSize: "0.7rem",
+          },
+          allowOverlap: true, // prevents auto-adjustment
+          crop: false,
+          overflow: "none",
         },
       },
       series: {

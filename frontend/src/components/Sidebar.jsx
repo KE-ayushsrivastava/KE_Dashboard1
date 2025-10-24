@@ -152,7 +152,6 @@ export default function Sidebar({
             <ListItemButton
               sx={{
                 mx: 1,
-                mx: 1,
                 my: 1,
                 py: 0,
                 borderRadius: "8px",

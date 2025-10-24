@@ -1,33 +1,32 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Card,
   CardContent,
   Grid,
   Button,
-  IconButton,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
 } from "@mui/material";
-import Sidebar, { drawerWidth, collapsedWidth } from "./Sidebar";
-import "../custom.css"; // make sure this path matches your project
+import Masonry from "@mui/lab/Masonry";
+import "../custom.css";
 import Filters from "./Filters";
 import { filterConfig } from "../config/filtersData";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import CardX from "./CardX"; // ✅ your custom Card component
+import CardX from "./CardX";
 import tabDetails from "../config/tabDetails";
 
 export default function Content({ children }) {
-  const [open, setOpen] = useState(true);
   const [selectedTab, setSelectedTab] = useState("KPI");
 
   // store API-returned configs for each question
   const [charts, setCharts] = useState([]);
 
-  const toggleDrawer = () => setOpen((prev) => !prev);
-
-  // keep this simple — just change tab state
+  // ✅ Tab change handler
   const handleTabSelect = (tab) => setSelectedTab(tab);
 
-  // ✅ Single filters state
+  // ✅ Filters state
   const [filters, setFilters] = useState(
     filterConfig.reduce((acc, f) => ({ ...acc, [f.key]: [] }), {})
   );
@@ -37,13 +36,10 @@ export default function Content({ children }) {
     setFilters((prev) => ({ ...prev, [key]: safeValues }));
   };
 
-  // ✅ normal function (no useCallback needed)
   const handleApply = async (overrideFilters) => {
     const activeFilters = overrideFilters || filters;
-    debugger;
     try {
       console.log("Applied Filters:", { ...filters, selectedTab });
-      console.log(activeFilters);
       const questions = tabDetails[selectedTab] || [];
 
       const results = await Promise.all(
@@ -52,8 +48,8 @@ export default function Content({ children }) {
           params.set("questionType", q.questionType);
           params.set("chartType", q.chartType);
           params.set("variableName", q.variableName);
+          params.set("valueRange", q.valueRange);
 
-          // filters add karo
           Object.entries(activeFilters).forEach(([key, vals]) => {
             if (Array.isArray(vals) && vals.length > 0) {
               params.set(key, vals.join(","));
@@ -79,7 +75,6 @@ export default function Content({ children }) {
     }
   };
 
-  // whenever selectedTab changes → re-run apply
   useEffect(() => {
     handleApply();
   }, [selectedTab]);
@@ -90,87 +85,69 @@ export default function Content({ children }) {
       {}
     );
     setFilters(cleared);
-    handleApply(cleared); // 👈 yaha direct cleared filters bhej do
+    handleApply(cleared);
   };
 
   const questions = tabDetails[selectedTab] || [];
+  console.log("q" + selectedTab);
+  const getWidthPercent = (width) => {
+    // assuming 12-column layout logic
+    const colSpan = Math.min(width || 4, 12);
+    return `${(colSpan / 12) * 100}%`;
+  };
+
+  const [open, setOpen] = useState(false);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      {/* Body: Sidebar + Main */}
-      <Box sx={{ display: "flex", flexGrow: 1 }}>
-        {/* Sidebar */}
-        <Sidebar
-          tabs={["KPI", "Pre-Sales", "Facility"]}
-          onSelect={handleTabSelect}
-          activeTab={selectedTab}
-          onLogout={() => {}}
-          open={open}
-          toggleDrawer={toggleDrawer}
-        />
+      {/* Header Dropdown replacing Sidebar */}
 
-        {/* Collapse Button */}
-        <IconButton
-          className="collapse-btn"
-          onClick={toggleDrawer}
-          sx={{
-            position: "absolute",
-            top: "4%",
-            transform: "translateY(-50%)",
-            backgroundColor: "#FFF",
-            borderRadius: "50%",
-            boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
-            transition: "all 0.3s ease",
-            "&:hover": {
-              backgroundColor: "#F0F0F0",
-              color: "#415FFF",
-            },
-            left: open ? `${drawerWidth - 15}px` : `${collapsedWidth - 15}px`,
-          }}
-        >
-          <Box
+      {/* Main Content */}
+      <Box
+        component="main"
+        className="main-content"
+        sx={{
+          flexGrow: 1,
+          p: 1,
+          pt: 1,
+          width: "100%",
+        }}
+      >
+        {/* Filters Section */}
+        <Box>
+          <Card
+            variant="outlined"
             sx={{
-              display: "flex",
-              transition: "transform 0.3s ease",
-              transform: open ? "rotate(0deg)" : "rotate(180deg)",
+              borderRadius: 2,
+              boxShadow: "rgba(0, 0, 0, 0.35) 0px 3px 8px;",
             }}
           >
-            <ChevronLeftIcon />
-          </Box>
-        </IconButton>
-
-        {/* Main content */}
-        <Box
-          component="main"
-          className="main-content"
-          sx={{
-            flexGrow: 1,
-            p: 3,
-            pt: 1,
-            marginLeft: open ? `${drawerWidth}px` : `${collapsedWidth}px`,
-            width: open
-              ? `calc(100% - ${drawerWidth}px)`
-              : `calc(100% - ${collapsedWidth}px)`,
-            transition: (theme) =>
-              theme.transitions.create(["margin-left", "width"], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.standard,
-              }),
-          }}
-        >
-          {/* Filters */}
-          <Box>
-            <Card
-              variant="outlined"
-              sx={{
-                borderRadius: 2,
-                boxShadow: "rgba(0, 0, 0, 0.35) 0px 3px 8px;",
-              }}
-            >
-              <CardContent sx={{ padding: "16px !important" }}>
-                <Grid container spacing={1} alignItems="center">
+            <CardContent sx={{ padding: "10px !important" }}>
+              <Grid
+                container
+                spacing={1}
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                {/* Left side – Filters & Buttons */}
+                <Grid
+                  item
+                  xs={12}
+                  md={9}
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                  }}
+                >
                   {filterConfig.map((f) => (
-                    <Grid item xs={12} md={3} key={f.key}>
+                    <Box
+                      key={f.key}
+                      sx={{
+                        m: 0.2,
+                        flex: "1 1 1 22%",
+                      }}
+                    >
                       <Filters
                         label={f.label}
                         options={f.options}
@@ -178,11 +155,10 @@ export default function Content({ children }) {
                         setSelected={(vals) => updateFilter(f.key, vals)}
                         field={f.key}
                       />
-                    </Grid>
+                    </Box>
                   ))}
 
-                  {/* Buttons row */}
-                  <Grid item>
+                  <Box sx={{ display: "flex", gap: 0.5, m: 0.2 }}>
                     <Button
                       variant="contained"
                       color="success"
@@ -191,8 +167,6 @@ export default function Content({ children }) {
                     >
                       Apply
                     </Button>
-                  </Grid>
-                  <Grid item>
                     <Button
                       variant="contained"
                       color="error"
@@ -201,17 +175,214 @@ export default function Content({ children }) {
                     >
                       Reset
                     </Button>
-                  </Grid>
+                  </Box>
                 </Grid>
-              </CardContent>
-            </Card>
-          </Box>
 
-          {/* Active Tab Title */}
-          {/* <h2>{selectedTab}</h2> */}
-          {children}
+                {/* Right side – Dropdown */}
+                <Grid
+                  item
+                  xs={12}
+                  md={3}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                  }}
+                >
+                  <FormControl
+                    sx={{
+                      minWidth: 100,
+                      backgroundColor: "#fff",
+                      borderRadius: "8px",
+                    }}
+                    size="small"
+                    onMouseEnter={() => setOpen(true)}
+                    onMouseLeave={() => setOpen(false)}
+                  >
+                    <InputLabel
+                      id="tab-select-label"
+                      sx={{ fontSize: 12, top: 2 }}
+                    >
+                      Select Tab
+                    </InputLabel>
+                    <Select
+                      labelId="tab-select-label"
+                      open={open}
+                      onOpen={() => setOpen(true)}
+                      onClose={() => setOpen(false)}
+                      value={selectedTab}
+                      label="Select Tab"
+                      onChange={(e) => handleTabSelect(e.target.value)}
+                      sx={{ fontSize: 12 }}
+                      MenuProps={{
+                        disableScrollLock: true, // Optional: prevent scroll issue
+                        PaperProps: {
+                          onMouseEnter: () => setOpen(true), // Keep menu open while hovering
+                          onMouseLeave: () => setOpen(false),
+                        },
+                      }}
+                    >
+                      <MenuItem value="KPI" sx={{ fontSize: 12 }}>
+                        KPI
+                      </MenuItem>
+                      <MenuItem value="Pre-Sales" sx={{ fontSize: 12 }}>
+                        Pre-Sales
+                      </MenuItem>
+                      <MenuItem value="Facility" sx={{ fontSize: 12 }}>
+                        Facility
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Box>
 
-          {/* ✅ Dynamic Cards */}
+        {children}
+
+        {/* Dynamic Cards */}
+        {/* <Grid container spacing={1} sx={{ mt: 1 }}>
+          {charts.length > 0
+            ? charts.map((c) => (
+                <CardX
+                  key={c.id}
+                  width={c.width}
+                  height={c.chartHeight}
+                  title={c.title}
+                >
+                  {c.chartType === "ColumnX"
+                    ? (() => {
+                        const ChartComp = c.component;
+                        return (
+                          <ChartComp config={c.config} height={c.chartHeight} />
+                        );
+                      })()
+                    : React.cloneElement(c.component, {
+                        config: c.config,
+                        height: c.chartHeight,
+                      })}
+                </CardX>
+              ))
+            : questions.map((q) => (
+                <CardX
+                  key={q.id}
+                  width={q.width}
+                  height={q.chartHeight}
+                  title={q.title}
+                >
+                  {React.isValidElement(q.component)
+                    ? React.cloneElement(q.component, {
+                        config: q.config,
+                        height: q.chartHeight,
+                      })
+                    : React.createElement(q.component, {
+                        config: q.config,
+                        height: q.chartHeight,
+                      })}
+                </CardX>
+              ))}
+        </Grid>
+        <Masonry
+          columns={{ xs: 1, sm: 2, md: 3 }}
+          spacing={1}
+          sx={{
+            width: "100%",
+            alignItems: "start",
+            mt: 1,
+          }}
+        >
+          {(charts.length > 0 ? charts : questions).map((item) => (
+            <Box
+              key={item.id}
+              sx={{
+                width: getWidthPercent(item.width),
+                display: "inline-block",
+              }}
+            >
+              <CardX
+                width={item.width}
+                height={item.chartHeight}
+                title={item.title}
+                sx={{
+                  height: item.chartHeight,
+                  width: "100%",
+                }}
+              >
+                {item.chartType === "ColumnX"
+                  ? (() => {
+                      const ChartComp = item.component;
+                      return (
+                        <ChartComp
+                          config={item.config}
+                          height={item.chartHeight}
+                        />
+                      );
+                    })()
+                  : React.isValidElement(item.component)
+                  ? React.cloneElement(item.component, {
+                      config: item.config,
+                      height: item.chartHeight,
+                    })
+                  : React.createElement(item.component, {
+                      config: item.config,
+                      height: item.chartHeight,
+                    })}
+              </CardX>
+            </Box>
+          ))}
+        </Masonry> */}
+        {selectedTab === "Facility" ? (
+          <Masonry
+            columns={{ xs: 1, sm: 2, md: 3 }}
+            spacing={1}
+            sx={{
+              width: "100%",
+              alignItems: "start",
+              mt: 0.5,
+            }}
+          >
+            {(charts.length > 0 ? charts : questions).map((item) => (
+              <Box
+                key={item.id}
+                sx={{
+                  width: getWidthPercent(item.width),
+                  display: "inline-block",
+                }}
+              >
+                <CardX
+                  width={item.width}
+                  height={item.chartHeight}
+                  title={item.title}
+                  sx={{
+                    height: item.chartHeight,
+                    width: "100%",
+                  }}
+                >
+                  {item.chartType === "ColumnX"
+                    ? (() => {
+                        const ChartComp = item.component;
+                        return (
+                          <ChartComp
+                            config={item.config}
+                            height={item.chartHeight}
+                          />
+                        );
+                      })()
+                    : React.isValidElement(item.component)
+                    ? React.cloneElement(item.component, {
+                        config: item.config,
+                        height: item.chartHeight,
+                      })
+                    : React.createElement(item.component, {
+                        config: item.config,
+                        height: item.chartHeight,
+                      })}
+                </CardX>
+              </Box>
+            ))}
+          </Masonry>
+        ) : (
           <Grid container spacing={1} sx={{ mt: 1 }}>
             {charts.length > 0
               ? charts.map((c) => (
@@ -222,8 +393,7 @@ export default function Content({ children }) {
                     title={c.title}
                   >
                     {c.chartType === "ColumnX"
-                      ? // 👇 ColumnXChart ko as JSX render karo
-                        (() => {
+                      ? (() => {
                           const ChartComp = c.component;
                           return (
                             <ChartComp
@@ -232,14 +402,13 @@ export default function Content({ children }) {
                             />
                           );
                         })()
-                      : // 👇 Baaki charts ke liye cloneElement hi rakho
-                        React.cloneElement(c.component, {
+                      : React.cloneElement(c.component, {
                           config: c.config,
                           height: c.chartHeight,
                         })}
                   </CardX>
                 ))
-              : (tabDetails[selectedTab] || []).map((q) => (
+              : questions.map((q) => (
                   <CardX
                     key={q.id}
                     width={q.width}
@@ -247,20 +416,18 @@ export default function Content({ children }) {
                     title={q.title}
                   >
                     {React.isValidElement(q.component)
-                      ? // Case 1: Already JSX element (e.g. <AreaChart />)
-                        React.cloneElement(q.component, {
+                      ? React.cloneElement(q.component, {
                           config: q.config,
                           height: q.chartHeight,
                         })
-                      : // Case 2: Function reference (e.g. ColumnXChart)
-                        React.createElement(q.component, {
+                      : React.createElement(q.component, {
                           config: q.config,
                           height: q.chartHeight,
                         })}
                   </CardX>
                 ))}
           </Grid>
-        </Box>
+        )}
       </Box>
     </Box>
   );

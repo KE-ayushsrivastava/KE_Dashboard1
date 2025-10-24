@@ -4,6 +4,7 @@ import HighchartsReact from "highcharts-react-official";
 import { Box, Typography } from "@mui/material";
 
 export default function ColumnChart({ config, height }) {
+  debugger;
   if (!config) {
     return (
       <Box

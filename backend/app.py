@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from classes import NPSCalculator, SingleSelectCalculator, build_filter_cond
+from classes import NPSCalculator, SingleSelectCalculator, MultiSelectCalculator, build_filter_cond
 from mapper import to_highcharts_config
 
 oemVal = 0
@@ -37,6 +37,7 @@ def chart_data():
     question_type = request.args.get("questionType")
     chart_type = request.args.get("chartType")
     prefix = request.args.get("variableName")
+    value_range = request.args.get("valueRange")
 
     filters = {
         "time": request.args.get("time", "").split(",") if request.args.get("time") else [],
@@ -59,6 +60,15 @@ def chart_data():
         raw_data = calc.calculate(
             prefix=prefix, 
             prefix2=column_name,
+            brand_dict=brand,
+        )
+        data_labels = ["top2"]
+    elif question_type == "Multi_Select":
+        calc = MultiSelectCalculator(condX)
+        raw_data = calc.calculate(
+            prefix=prefix, 
+            prefix2=column_name,
+            value_range=value_range,
             brand_dict=brand,
         )
         data_labels = ["top2"]

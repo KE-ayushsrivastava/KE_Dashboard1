@@ -4,10 +4,17 @@ from mysql.connector import pooling
 # Connection Pool Setup
 dbconfig = {
     "host": "localhost",
-    "user": "kepython",
-    "password": "KePython@12345",
+    "user": "root",
+    "password": "pass@123",
     "database": "pj_chakra_db"
 }
+
+# dbconfig = {
+#     "host": "localhost",
+#     "user": "kepython",
+#     "password": "KePython@12345",
+#     "database": "pj_chakra_db"
+# }
 
 # Pool create (size tumhare concurrent users ke hisaab se adjust karna)
 connection_pool = pooling.MySQLConnectionPool(
@@ -50,10 +57,10 @@ column_colors = {
     ]
 },
 "Mahindra": {
-    "linearGradient": {"x1": 0, "y1": 0, "x2": 0, "y2": 1},
+    "linearGradient": { "x1": 0, "y1": 0, "x2": 0, "y2": 1 },
     "stops": [
-        [0, "#db2777"],
-        [1, "#f472b6"]
+        [0, "#dc2626"],
+        [1, "#f87171"]
     ]
 },
 "Tata Motors": {

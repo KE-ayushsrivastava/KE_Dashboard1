@@ -64,9 +64,9 @@ export default function ColumnXChart({ config, height }) {
       top: ["#ddd6fe", "#ede9fe"],
     },
     Mahindra: {
-      left: ["#db2777", "#f472b6"],
-      right: ["#be185d", "#ec4899"],
-      top: ["#fbcfe8", "#fce7f3"],
+      left: ["#dc2626", "#f87171"],
+      right: ["#b91c1c", "#ef4444"],
+      top: ["#fecaca", "#fee2e2"],
     },
     "Tata Motors": {
       left: ["#ea580c", "#fb923c"],
