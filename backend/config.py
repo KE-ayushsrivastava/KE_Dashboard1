@@ -2,19 +2,19 @@ import mysql.connector
 from mysql.connector import pooling
 
 # Connection Pool Setup
-dbconfig = {
-    "host": "localhost",
-    "user": "root",
-    "password": "pass@123",
-    "database": "pj_chakra_db"
-}
-
 # dbconfig = {
 #     "host": "localhost",
-#     "user": "kepython",
-#     "password": "KePython@12345",
+#     "user": "root",
+#     "password": "pass@123",
 #     "database": "pj_chakra_db"
 # }
+
+dbconfig = {
+    "host": "localhost",
+    "user": "kepython",
+    "password": "KePython@12345",
+    "database": "pj_chakra_db"
+}
 
 # Pool create (size tumhare concurrent users ke hisaab se adjust karna)
 connection_pool = pooling.MySQLConnectionPool(
